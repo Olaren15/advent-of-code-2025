@@ -4,10 +4,10 @@ const headers = {
   Cookie: `session=${process.env.SESSION}`
 }
 
-export function fetchInput({ day, year }: { day: number; year: number }) {
-  return fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
+export async function fetchInput({ day, year }: { day: number; year: number }) {
+  const response = await fetch(`https://adventofcode.com/${year}/day/${day}/input`, {
     headers
-  })
-    .then(isOk)
-    .then(response => response.text())
+  });
+  const response_1 = await isOk(response);
+  return await response_1.text();
 }
