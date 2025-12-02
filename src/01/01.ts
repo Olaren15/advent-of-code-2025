@@ -34,10 +34,9 @@ export function partTwo(input: ReturnType<typeof parse>) {
     let count = 0;
 
     for (let rotation of input) {
-        let amount = Math.abs(rotation);
         let delta = rotation < 0 ? -1 : 1;
 
-        while (amount > 0) {
+        while (rotation !== 0) {
             dial += delta;
 
             if (dial === -1) {
@@ -52,7 +51,7 @@ export function partTwo(input: ReturnType<typeof parse>) {
                 count++;
             }
 
-            amount--;
+            rotation -= delta;
         }
     }
 
