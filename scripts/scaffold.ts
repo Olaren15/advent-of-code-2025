@@ -1,30 +1,45 @@
-import chalk from 'chalk'
-import dedent from 'dedent'
-import { existsSync } from 'node:fs'
-import { mkdir } from 'node:fs/promises'
+import chalk from "chalk";
+import dedent from "dedent";
 
-import { fetchInput } from './api.ts'
+import { fetchInput } from "./api.ts";
 
 export async function scaffold(day: number, year: number) {
-  const name = `${day}`.padStart(2, '0')
+  const name = `${day}`.padStart(2, "0");
 
-  const directory = new URL(`../src/${name}/`, import.meta.url)
+  const directory = `./src/${name}`;
 
-  if (existsSync(directory)) return
+  try {
+    const _ = await Deno.lstat(directory);
+    return;
+  } catch (err) {
+    if (!(err instanceof Deno.errors.NotFound)) {
+      throw err;
+    }
+  }
 
-  console.log(`📂 Setting up day ${day} of ${year}`)
+  console.log(`📂 Setting up day ${day} of ${year}`);
 
-  await mkdir(directory)
+  await Deno.mkdir(directory);
 
   const test = dedent`
-  import { describe } from 'bun:test'
+  import { assertEquals } from "@std/assert";
+  import { parse, partOne, partTwo } from "./${name}.ts";
 
-  describe(${`'Day ${day}'`}, () => {
-    describe('Part One', () => {})
-    
-    describe('Part Two', () => {})
-  })
-  `
+  const input = await Deno.readTextFile(\`src/${name}/example.txt\`);
+  const parsed = parse(input);
+
+  Deno.test("Day 1 - part 1 - should solve example", () => {
+    const result = partOne(parsed);
+
+    assertEquals(result, undefined);
+  });
+
+  Deno.test("Day 2 - part 2 - should solve example", () => {
+    const result = partTwo(parsed);
+
+    assertEquals(result, undefined);
+  });
+  `;
 
   const solution = dedent`
   export function parse(input: string) {
@@ -34,22 +49,36 @@ export async function scaffold(day: number, year: number) {
   export function partOne(input: ReturnType<typeof parse>) {}
 
   export function partTwo(input: ReturnType<typeof parse>) {}
-  `
+  `;
 
-  console.log(`📂 Fetching your input`)
+  console.log(`📂 Fetching your input`);
 
   const input = await fetchInput({ day, year }).catch(() => {
     console.log(
       chalk.red.bold(
-        '📂 Fetching your input have failed, empty file will be created.'
-      )
-    )
-  })
+        "📂 Fetching your input have failed, empty file will be created.",
+      ),
+    );
+  });
 
-  await Bun.write(new URL(`${name}.test.ts`, directory.href).pathname, test)
-  await Bun.write(new URL(`${name}.ts`, directory.href).pathname, solution)
-  await Bun.write(new URL(`input.txt`, directory.href).pathname, input ?? '')
-  await Bun.write(new URL(`example.txt`, directory.href).pathname, '')
+  const encoder = new TextEncoder();
 
-  console.log('📂 You all set up, have fun!')
+  await Deno.writeFile(
+    `${directory}/${name}.test.ts`,
+    encoder.encode(test),
+  );
+  await Deno.writeFile(
+    `${directory}/${name}.ts`,
+    encoder.encode(solution),
+  );
+  await Deno.writeFile(
+    `${directory}/input.txt`,
+    encoder.encode(input ?? ""),
+  );
+  await Deno.writeFile(
+    `${directory}/example.txt`,
+    encoder.encode(""),
+  );
+
+  console.log("📂 You all set up, have fun!");
 }
