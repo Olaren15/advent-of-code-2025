@@ -15,4 +15,3 @@ Deno.test("Day 2 - part 2 - should solve example", () => {
 
   assertEquals(result, 43);
 });
-

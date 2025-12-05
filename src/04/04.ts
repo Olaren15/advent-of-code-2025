@@ -93,4 +93,3 @@ function canBeRemoved(input: string[][], i: number, j: number): boolean {
 
   return paperAround < 4;
 }
-
