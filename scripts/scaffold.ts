@@ -28,13 +28,13 @@ export async function scaffold(day: number, year: number) {
   const input = await Deno.readTextFile(\`src/${name}/example.txt\`);
   const parsed = parse(input);
 
-  Deno.test("Day 1 - part 1 - should solve example", () => {
+  Deno.test("Day ${day} - part 1 - should solve example", () => {
     const result = partOne(parsed);
 
     assertEquals(result, undefined);
   });
 
-  Deno.test("Day 2 - part 2 - should solve example", () => {
+  Deno.test("Day ${day} - part 2 - should solve example", () => {
     const result = partTwo(parsed);
 
     assertEquals(result, undefined);
@@ -63,22 +63,10 @@ export async function scaffold(day: number, year: number) {
 
   const encoder = new TextEncoder();
 
-  await Deno.writeFile(
-    `${directory}/${name}.test.ts`,
-    encoder.encode(test),
-  );
-  await Deno.writeFile(
-    `${directory}/${name}.ts`,
-    encoder.encode(solution),
-  );
-  await Deno.writeFile(
-    `${directory}/input.txt`,
-    encoder.encode(input ?? ""),
-  );
-  await Deno.writeFile(
-    `${directory}/example.txt`,
-    encoder.encode(""),
-  );
+  await Deno.writeFile(`${directory}/${name}.test.ts`, encoder.encode(test));
+  await Deno.writeFile(`${directory}/${name}.ts`, encoder.encode(solution));
+  await Deno.writeFile(`${directory}/input.txt`, encoder.encode(input ?? ""));
+  await Deno.writeFile(`${directory}/example.txt`, encoder.encode(""));
 
   console.log("📂 You all set up, have fun!");
 }
