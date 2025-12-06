@@ -50,6 +50,50 @@ export function partOne(input: ReturnType<typeof parse>) {
 }
 
 export function partTwo(input: ReturnType<typeof parse>) {
-  // It looks like I am too stupid for this one :(
-}
+  const ranges: Range[] = [input.ranges[0]];
 
+  for (let i = 1; i < input.ranges.length; i++) {
+    const toInsert = input.ranges[i];
+    let inserted = false;
+
+    for (let j = 0; j < ranges.length; j++) {
+      if (toInsert.begin <= ranges[j].begin) {
+        if (toInsert.end >= ranges[j].begin) {
+          ranges[j].begin = toInsert.begin;
+          ranges[j].end = Math.max(toInsert.end, ranges[j].end);
+
+          while (j + 1 < ranges.length && toInsert.end >= ranges[j + 1].begin) {
+            ranges[j].end = Math.max(toInsert.end, ranges[j + 1].end);
+            ranges.splice(j + 1, 1);
+          }
+        } else {
+          ranges.splice(j, 0, toInsert);
+        }
+
+        inserted = true;
+        break;
+      } else if (toInsert.begin <= ranges[j].end) {
+        ranges[j].end = Math.max(toInsert.end, ranges[j].end);
+
+        while (j + 1 < ranges.length && toInsert.end >= ranges[j + 1].begin) {
+          ranges[j].end = Math.max(toInsert.end, ranges[j + 1].end);
+          ranges.splice(j + 1, 1);
+        }
+
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      ranges.push(toInsert);
+    }
+  }
+
+  let sum = 0;
+  ranges.forEach((n) => {
+    sum += n.end - n.begin + 1;
+  });
+
+  return sum;
+}
